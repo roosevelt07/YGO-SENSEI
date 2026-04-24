@@ -8,7 +8,7 @@ from google.genai import types
 from app.config import settings
 from app.models import CardData
 
-_client = genai.Client(api_key=settings.google_api_key)
+_client = genai.Client(api_key=settings.gemini_api_key)
 
 _SYSTEM_PROMPT = """Você é o Sensei do Duelo — um duelista experiente e estrategista de Yu-Gi-Oh! com décadas de experiência em competições.
 Você analisa decks com profundidade técnica e paixão, respondendo sempre em português brasileiro.
