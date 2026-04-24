@@ -2,6 +2,12 @@
 
 > Strategic Yu-Gi-Oh! deck analysis powered by AI
 
+![Python](https://img.shields.io/badge/python-3.9+-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?logo=fastapi&logoColor=white)
+![Gemini](https://img.shields.io/badge/Gemini-1.5--flash-4285F4?logo=google&logoColor=white)
+![Tests](https://img.shields.io/badge/tests-14%20passed-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
+
 ## Overview
 
 **ygo-sensei** is a REST API built with FastAPI that receives a list of Yu-Gi-Oh! card
@@ -68,7 +74,11 @@ uvicorn main:app --reload
 
 Returns the API status.
 
-**Response**
+```bash
+curl http://localhost:8000/health
+```
+
+**Response 200**
 ```json
 { "status": "ok" }
 ```
@@ -79,7 +89,9 @@ Returns the API status.
 
 Fetches data for a single card from the YGOPRODeck database.
 
-**Path parameter:** `name` — exact card name (e.g. `Dark Magician`)
+```bash
+curl http://localhost:8000/card/Dark%20Magician
+```
 
 **Response 200**
 ```json
@@ -101,22 +113,28 @@ Fetches data for a single card from the YGOPRODeck database.
 
 ### POST /analyze
 
-Receives a list of card names, fetches their data, and returns an AI-generated strategic analysis of the deck's synergy in Brazilian Portuguese.
+Receives a list of card names, fetches their data, and returns an AI-generated strategic
+analysis of the deck's synergy in Brazilian Portuguese.
 
-**Request body**
-```json
-{
-  "cards": ["Dark Magician", "Dark Magician Girl", "Mystic Box"]
-}
+```bash
+curl -X POST http://localhost:8000/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"cards": ["Dark Magician", "Dark Magician Girl", "Mystic Box"]}'
 ```
 
-- `cards`: list of card names — minimum 1, maximum 60.
+**Request body**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `cards` | `string[]` | ✅ Yes | List of card names (1–60) |
 
 **Response 200**
 ```json
 {
   "analysis": "Este deck gira em torno do Dark Magician como peça central...",
-  "cards_found": [ { "name": "Dark Magician", "type": "Normal Monster", ... } ],
+  "cards_found": [
+    { "name": "Dark Magician", "type": "Normal Monster", "atk": 2500, "def": 2100, "..." }
+  ],
   "cards_not_found": []
 }
 ```
@@ -128,6 +146,10 @@ Receives a list of card names, fetches their data, and returns an AI-generated s
 ```bash
 pip install -r requirements-dev.txt
 pytest tests/ -v
+```
+
+```
+14 passed in 0.18s
 ```
 
 ## Limitations
