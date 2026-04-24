@@ -1,13 +1,14 @@
-"""LLM-powered deck synergy analysis using the Anthropic API."""
+"""LLM-powered deck synergy analysis using the Google Generative AI API."""
 
 from typing import List
 
-import anthropic
+from google import genai
+from google.genai import types
 
 from app.config import settings
 from app.models import CardData
 
-_client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+_client = genai.Client(api_key=settings.google_api_key)
 
 _SYSTEM_PROMPT = """Você é o Sensei do Duelo — um duelista experiente e estrategista de Yu-Gi-Oh! com décadas de experiência em competições.
 Você analisa decks com profundidade técnica e paixão, respondendo sempre em português brasileiro.
@@ -30,22 +31,12 @@ def analyze_deck(cards: List[CardData], cards_not_found: List[str]) -> str:
     if cards_not_found:
         cards_text += f"\n\nCartas não encontradas na base: {', '.join(cards_not_found)}"
 
-    response = _client.messages.create(
+    response = _client.models.generate_content(
         model=settings.llm_model,
-        max_tokens=1024,
-        system=[
-            {
-                "type": "text",
-                "text": _SYSTEM_PROMPT,
-                "cache_control": {"type": "ephemeral"},
-            }
-        ],
-        messages=[
-            {
-                "role": "user",
-                "content": f"Analise a sinergia estratégica deste deck:\n\n{cards_text}",
-            }
-        ],
+        contents=f"Analise a sinergia estratégica deste deck:\n\n{cards_text}",
+        config=types.GenerateContentConfig(
+            system_instruction=_SYSTEM_PROMPT,
+        ),
     )
 
-    return response.content[0].text
+    return response.text
